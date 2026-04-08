@@ -305,16 +305,10 @@ contract NegRiskAdapter is ERC1155Holder {
             }
         }
 
-        // Return (K-1)*amount of collateral to caller (they provided K*amount of collateral above)
-        uint256 colOut = (k - 1) * amount;
-        if (colOut > 0) {
-            // Fee calculation
-            uint256 fee = (colOut * market.feeBips) / FEE_DENOMINATOR;
-            if (fee > 0) {
-                col.safeTransfer(vault, fee);
-                colOut -= fee;
-            }
-            col.safeTransfer(msg.sender, colOut);
+        // Fee on the 1-unit net cost (caller provided k collateral, k wcol consumed in splits)
+        uint256 fee = (amount * market.feeBips) / FEE_DENOMINATOR;
+        if (fee > 0) {
+            col.safeTransfer(vault, fee);
         }
 
         emit PositionsConverted(msg.sender, marketId, indexSet, amount);
@@ -327,8 +321,20 @@ contract NegRiskAdapter is ERC1155Holder {
      */
     function redeemPositions(bytes32 questionId, uint256[] calldata indexSets) external {
         bytes32 conditionId = getConditionId(questionId);
+
+        // Pull the caller's position tokens into this contract so CTF can burn them
+        for (uint256 i = 0; i < indexSets.length; i++) {
+            bytes32 collectionId = ctf.getCollectionId(bytes32(0), conditionId, indexSets[i]);
+            uint256 positionId = ctf.getPositionId(IERC20(address(wcol)), collectionId);
+            uint256 bal = IERC1155(address(ctf)).balanceOf(msg.sender, positionId);
+            if (bal > 0) {
+                IERC1155(address(ctf)).safeTransferFrom(msg.sender, address(this), positionId, bal, "");
+            }
+        }
+
         ctf.redeemPositions(IERC20(address(wcol)), bytes32(0), conditionId, indexSets);
-        // Forward any released wcol back as underlying collateral
+
+        // Unwrap any wcol received and forward as raw collateral to caller
         uint256 wcolBal = wcol.balanceOf(address(this));
         if (wcolBal > 0) {
             wcol.unwrap(msg.sender, wcolBal);

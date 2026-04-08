@@ -66,20 +66,20 @@ contract OptimisticOracleTest is Test {
     function test_makeAssertion_revertsOnBadLiveness() public {
         vm.prank(asserter);
         vm.expectRevert("Oracle: bad liveness");
-        oracle.makeAssertion(conditionId, yesPayouts, address(bond), BOND, 30 seconds);
+        oracle.makeAssertion(conditionId, questionId, yesPayouts, address(bond), BOND, 30 seconds);
     }
 
     function test_makeAssertion_revertsOnZeroBond() public {
         vm.prank(asserter);
         vm.expectRevert("Oracle: zero bond");
-        oracle.makeAssertion(conditionId, yesPayouts, address(bond), 0, LIVENESS);
+        oracle.makeAssertion(conditionId, questionId, yesPayouts, address(bond), 0, LIVENESS);
     }
 
     function test_makeAssertion_revertsIfActiveExists() public {
         _assert(yesPayouts);
         vm.prank(asserter);
         vm.expectRevert("Oracle: active assertion exists");
-        oracle.makeAssertion(conditionId, yesPayouts, address(bond), BOND, LIVENESS);
+        oracle.makeAssertion(conditionId, questionId, yesPayouts, address(bond), BOND, LIVENESS);
     }
 
     // =========================================================================
@@ -94,8 +94,8 @@ contract OptimisticOracleTest is Test {
         oracle.disputeAssertion(aId);
 
         assertEq(bond.balanceOf(disputer), before - BOND);
-        (,,,,,,,, OptimisticOracle.AssertionState state) = oracle.assertions(aId);
-        assertEq(uint8(state), uint8(OptimisticOracle.AssertionState.Disputed));
+        OptimisticOracle.Assertion memory a = oracle.getAssertion(aId);
+        assertEq(uint8(a.state), uint8(OptimisticOracle.AssertionState.Disputed));
     }
 
     function test_disputeAssertion_revertsAfterLiveness() public {
@@ -217,8 +217,8 @@ contract OptimisticOracleTest is Test {
         oracle.cancelAssertion(aId);
 
         assertEq(bond.balanceOf(asserter), before + BOND);
-        (,,,,,,,, OptimisticOracle.AssertionState state) = oracle.assertions(aId);
-        assertEq(uint8(state), uint8(OptimisticOracle.AssertionState.Cancelled));
+        OptimisticOracle.Assertion memory a2 = oracle.getAssertion(aId);
+        assertEq(uint8(a2.state), uint8(OptimisticOracle.AssertionState.Cancelled));
     }
 
     function test_cancelAssertion_withDisputer_returnsBothBonds() public {
@@ -263,6 +263,6 @@ contract OptimisticOracleTest is Test {
 
     function _assert(uint256[] memory payouts) internal returns (bytes32) {
         vm.prank(asserter);
-        return oracle.makeAssertion(conditionId, payouts, address(bond), BOND, LIVENESS);
+        return oracle.makeAssertion(conditionId, questionId, payouts, address(bond), BOND, LIVENESS);
     }
 }

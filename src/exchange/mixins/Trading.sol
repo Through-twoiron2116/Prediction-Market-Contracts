@@ -225,25 +225,29 @@ abstract contract Trading is Assets, Fees, NonceManager, Pausable, Registry, Sig
     // Internal: Settlement
     // =========================================================================
 
-    /// @dev Settle a single order fill (taker calls fillOrder directly)
+    /// @dev Settle a single order fill.
+    ///      `to` is the taker (operator address for fillOrder calls).
+    ///      SELL: maker gives tokens → taker; taker gives collateral → maker.
+    ///      BUY:  maker gives collateral → taker; taker gives tokens → maker.
     function _settleOrder(Order calldata order, address to, uint256 making, uint256 taking, uint256 fee) internal {
-        if (order.side == Side.BUY) {
-            // Maker provides collateral, receives tokens
-            IERC20(collateral).safeTransferFrom(order.maker, address(this), making);
+        if (order.side == Side.SELL) {
+            // Maker sells tokens → taker; taker pays collateral → maker
+            IERC1155(ctf).safeTransferFrom(order.maker, to, order.tokenId, making, "");
+            uint256 payout = taking - fee;
+            IERC20(collateral).safeTransferFrom(to, order.maker, payout);
             if (fee > 0) {
-                IERC20(collateral).safeTransfer(_feeReceiver(), fee);
+                IERC20(collateral).safeTransferFrom(to, _feeReceiver(), fee);
                 emit FeeCharged(_feeReceiver(), order.tokenId, fee);
+            }
+        } else {
+            // Maker buys tokens with collateral → taker pays tokens → maker
+            uint256 colFee = _computeFee(making, order.feeRateBps);
+            IERC20(collateral).safeTransferFrom(order.maker, to, making - colFee);
+            if (colFee > 0) {
+                IERC20(collateral).safeTransferFrom(order.maker, _feeReceiver(), colFee);
+                emit FeeCharged(_feeReceiver(), order.tokenId, colFee);
             }
             IERC1155(ctf).safeTransferFrom(to, order.maker, order.tokenId, taking, "");
-        } else {
-            // Maker provides tokens, receives collateral
-            IERC1155(ctf).safeTransferFrom(order.maker, address(this), order.tokenId, making, "");
-            uint256 payout = taking - fee;
-            IERC20(collateral).safeTransfer(order.maker, payout);
-            if (fee > 0) {
-                IERC20(collateral).safeTransfer(_feeReceiver(), fee);
-                emit FeeCharged(_feeReceiver(), order.tokenId, fee);
-            }
         }
     }
 

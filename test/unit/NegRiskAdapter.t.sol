@@ -122,20 +122,22 @@ contract NegRiskAdapterTest is Test {
             adapter.splitPosition(questionIds[i], AMOUNT);
         }
 
-        // indexSet = 0b011 = questions 0 and 1 (k=2)
-        // Expected: 1 * AMOUNT collateral out, YES tokens for Q0 and Q1
-        uint256 indexSet = 3; // 0b011 — questions 0 and 1
+        // indexSet = 3 = questions 0 and 1 (k=2)
+        // Mechanism: pull k*amount USDC + k NO tokens, split k wcol → k YES + k NO_fresh, burn 2k NO, give k YES to caller
+        // Net cost to alice: k*AMOUNT USDC + k NO tokens → k YES tokens (no collateral returned)
+        uint256 indexSet = 3;
+        uint256 k = 2;
         uint256 usdcBefore = usdc.balanceOf(alice);
 
-        // convertPositions pulls AMOUNT collateral per question in indexSet
-        // and returns (k-1)*AMOUNT = 1*AMOUNT collateral
         vm.prank(alice);
         adapter.convertPositions(marketId, indexSet, AMOUNT);
 
-        // Alice should receive (2-1)*AMOUNT = AMOUNT collateral back
-        // She spent 2*AMOUNT collateral in convertPositions (one per question)
-        // Net: usdcBefore - 2*AMOUNT + 1*AMOUNT = usdcBefore - AMOUNT
-        assertEq(usdc.balanceOf(alice), usdcBefore - AMOUNT);
+        // Alice spent k*AMOUNT USDC for k YES tokens
+        assertEq(usdc.balanceOf(alice), usdcBefore - k * AMOUNT);
+
+        // Alice should now hold YES tokens for questions 0 and 1
+        assertEq(ctf.balanceOf(alice, adapter.getPositionId(questionIds[0], true)), AMOUNT * 2); // original + new
+        assertEq(ctf.balanceOf(alice, adapter.getPositionId(questionIds[1], true)), AMOUNT * 2);
     }
 
     function test_convertPositions_revertsOnSingleBit() public {

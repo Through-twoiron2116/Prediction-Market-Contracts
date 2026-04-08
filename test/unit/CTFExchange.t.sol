@@ -38,6 +38,9 @@ contract CTFExchangeTest is Test {
         maker = vm.addr(makerKey);
         taker = vm.addr(takerKey);
 
+        // Start at a non-zero timestamp so "expiration = block.timestamp - 1" is truly past
+        vm.warp(1_000_000);
+
         usdc = new ERC20Mock("USD Coin", "USDC", 6);
         ctf = new ConditionalTokens();
         exchange = new CTFExchange(address(usdc), address(ctf), feeReceiver);
@@ -59,14 +62,17 @@ contract CTFExchangeTest is Test {
         // Register token pair in exchange
         exchange.registerToken(noTokenId, yesTokenId, conditionId);
 
-        // Fund actors and grant approvals
+        // Fund actors and grant approvals (operator acts as taker in fillOrder calls)
         usdc.mint(maker, 1000e6);
         usdc.mint(taker, 1000e6);
+        usdc.mint(operator, 1000e6);
 
         vm.prank(maker);
         usdc.approve(address(ctf), type(uint256).max);
         vm.prank(taker);
         usdc.approve(address(ctf), type(uint256).max);
+        vm.prank(operator);
+        usdc.approve(address(exchange), type(uint256).max);
 
         // Give maker some YES tokens by splitting
         vm.prank(maker);
@@ -175,19 +181,19 @@ contract CTFExchangeTest is Test {
     // =========================================================================
 
     function test_fillOrder_sell_transfersTokens() public {
-        // maker has AMOUNT YES tokens; taker has USDC
         // Maker's SELL order: give AMOUNT YES tokens, want 80 USDC
+        // Operator calls fillOrder → operator IS the taker (receives tokens, pays USDC)
         Order memory order = _makeSellOrder(makerKey, yesTokenId, AMOUNT, 80e6, 0);
 
         uint256 makerUsdcBefore = usdc.balanceOf(maker);
-        uint256 takerYesBefore = ctf.balanceOf(taker, yesTokenId);
+        uint256 operatorYesBefore = ctf.balanceOf(operator, yesTokenId);
 
         vm.prank(operator);
         exchange.fillOrder(order, AMOUNT);
 
-        // Maker received USDC (minus fee), taker received YES tokens
+        // Maker received USDC, operator (taker) received YES tokens
         assertGt(usdc.balanceOf(maker), makerUsdcBefore);
-        assertEq(ctf.balanceOf(taker, yesTokenId), takerYesBefore + AMOUNT);
+        assertEq(ctf.balanceOf(operator, yesTokenId), operatorYesBefore + AMOUNT);
     }
 
     function test_fillOrder_sell_partialFill() public {

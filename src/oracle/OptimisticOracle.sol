@@ -34,6 +34,7 @@ contract OptimisticOracle is Auth {
 
     struct Assertion {
         bytes32 conditionId;
+        bytes32 questionId;  // stored so reportPayouts can use it (CTF requires questionId, not conditionId)
         address asserter;
         address disputer;
         address bondToken;
@@ -104,6 +105,7 @@ contract OptimisticOracle is Auth {
      */
     function makeAssertion(
         bytes32 conditionId,
+        bytes32 questionId,
         uint256[] calldata payouts,
         address bondToken,
         uint256 bondAmount,
@@ -117,7 +119,7 @@ contract OptimisticOracle is Auth {
         _validatePayouts(payouts);
 
         assertionId = keccak256(
-            abi.encode(conditionId, msg.sender, payouts, bondToken, bondAmount, block.timestamp)
+            abi.encode(conditionId, questionId, msg.sender, payouts, bondToken, bondAmount, block.timestamp)
         );
         require(assertions[assertionId].asserter == address(0), "Oracle: assertion exists");
 
@@ -125,6 +127,7 @@ contract OptimisticOracle is Auth {
 
         assertions[assertionId] = Assertion({
             conditionId: conditionId,
+            questionId: questionId,
             asserter: msg.sender,
             disputer: address(0),
             bondToken: bondToken,
@@ -172,7 +175,7 @@ contract OptimisticOracle is Auth {
         IERC20(a.bondToken).safeTransfer(a.asserter, a.bondAmount);
 
         // Report to CTF
-        ctf.reportPayouts(_getQuestionId(a.conditionId, a.payouts.length), a.payouts);
+        ctf.reportPayouts(a.questionId, a.payouts);
 
         emit AssertionResolved(assertionId, a.conditionId, a.payouts);
     }
@@ -201,7 +204,7 @@ contract OptimisticOracle is Auth {
         } else {
             finalPayouts = correctPayouts;
         }
-        ctf.reportPayouts(_getQuestionId(a.conditionId, finalPayouts.length), finalPayouts);
+        ctf.reportPayouts(a.questionId, finalPayouts);
 
         emit DisputeArbitrated(assertionId, asserterWon);
         emit AssertionResolved(assertionId, a.conditionId, finalPayouts);
@@ -255,18 +258,4 @@ contract OptimisticOracle is Auth {
         require(sum > 0, "Oracle: zero payout sum");
     }
 
-    /**
-     * @dev The CTF uses keccak256(oracle, questionId, outcomeSlotCount) as conditionId.
-     *      We recover the questionId from conditionId by reversing the hash is impossible,
-     *      so instead we store it at assertion creation time. For simplicity here we
-     *      call reportPayouts with the conditionId's embedded questionId.
-     *
-     *      In a real deployment, the asserter passes questionId explicitly and we
-     *      validate conditionId = ctf.getConditionId(address(this), questionId, slotCount).
-     */
-    function _getQuestionId(bytes32 conditionId, uint256 /*slotCount*/) internal pure returns (bytes32) {
-        // In practice, the assertion stores questionId separately.
-        // This stub returns conditionId as a placeholder — override in production.
-        return conditionId;
-    }
 }
