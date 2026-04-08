@@ -1,0 +1,28 @@
+# Foundry
+out/
+cache/
+broadcast/
+
+# Dependencies (tracked via foundry.toml, not git)
+lib/
+
+# Environment
+.env
+.env.local
+
+# Node (if any tooling added later)
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage
+lcov.info
+coverage/
