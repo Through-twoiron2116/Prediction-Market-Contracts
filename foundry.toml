@@ -1,0 +1,25 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.24"
+optimizer = true
+optimizer_runs = 1000000
+via_ir = true
+evm_version = "paris"
+
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "forge-std/=lib/forge-std/src/",
+]
+
+[profile.default.fuzz]
+runs = 1000
+
+[rpc_endpoints]
+arbitrum = "${ARBITRUM_RPC_URL}"
+abstract = "${ABSTRACT_RPC_URL}"
+
+[etherscan]
+arbitrum = { key = "${ARBISCAN_API_KEY}", url = "https://api.arbiscan.io/api" }
+abstract = { key = "${ABSTRACT_API_KEY}", url = "https://api.abscan.org/api" }
