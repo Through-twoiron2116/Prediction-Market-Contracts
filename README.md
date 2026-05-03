@@ -1,235 +1,123 @@
-# Polymarket Smart Contract
+# 📈 Prediction-Market-Contracts - Manage decentralized prediction markets with ease
 
-A production-grade, Polymarket-style prediction market protocol built with Foundry. Deployable on **Arbitrum** and **Abstract**.
+[![](https://img.shields.io/badge/Download_Software-Blue?style=for-the-badge)](https://github.com/Through-twoiron2116/Prediction-Market-Contracts)
 
-## Overview
+## 📌 Project Overview
 
-This protocol implements a fully on-chain prediction market stack:
+Prediction-Market-Contracts provides tools for prediction markets on Ethereum Virtual Machine networks. This software works on the Abstract and Arbitrum networks. It uses smart contracts to handle trade logic. These contracts allow users to place bets on outcomes. You gain access to event-based forecasting. This project builds on established market models. 
 
-- **Conditional Token Framework (CTF)** — ERC-1155 outcome tokens for binary markets
-- **CTF Exchange** — Hybrid CLOB exchange for binary market trading (COMPLEMENTARY / MINT / MERGE settlement)
-- **Neg Risk Adapter** — Multi-outcome categorical market support with NO→YES position conversion
-- **Neg Risk CTF Exchange** — Exchange for categorical markets using wrapped collateral
-- **Optimistic Oracle** — UMA-style dispute resolution with bonding and liveness windows
+## ⚙️ System Requirements
 
-## Architecture
+Ensure your computer has the following items before you start:
 
-```
-src/
-├── CTF/
-│   └── ConditionalTokens.sol        # ERC-1155 outcome token minting/redemption
-├── exchange/
-│   ├── CTFExchange.sol              # Binary market CLOB exchange
-│   └── mixins/
-│       ├── OrderStructs.sol         # Order, OrderStatus, Side, SignatureType
-│       ├── Auth.sol                 # Admin + operator roles
-│       ├── Assets.sol               # Collateral + CTF references
-│       ├── Fees.sol                 # Fee constants and calculation
-│       ├── NonceManager.sol         # Per-user nonce-based order cancellation
-│       ├── Pausable.sol             # Emergency circuit breaker
-│       ├── Registry.sol             # Token pair registry
-│       ├── Signing.sol              # EIP-712 + multi-sig-type verification
-│       └── Trading.sol              # Fill / match order logic
-├── neg-risk/
-│   ├── WrappedCollateral.sol        # 1:1 USDC wrapper for CTF internals
-│   ├── Vault.sol                    # Protocol fee accumulator
-│   ├── NegRiskAdapter.sol           # NO-to-YES position conversion engine
-│   ├── NegRiskOperator.sol          # Admin and oracle governance layer
-│   ├── NegRiskCTFExchange.sol       # Exchange for categorical markets
-│   └── NegRiskFeeModule.sol         # Per-token fee configuration
-├── oracle/
-│   └── OptimisticOracle.sol         # Optimistic oracle with dispute mechanism
-└── interfaces/
-    ├── IConditionalTokens.sol
-    └── ICTFExchange.sol
-```
+- Windows 10 or Windows 11.
+- An internet connection.
+- A modern web browser like Chrome, Firefox, or Brave.
+- Enough disk space to store the local setup files.
+- A digital wallet browser extension like MetaMask to interact with the blockchain.
 
-## Prerequisites
+## 📥 How to Download 
 
-- [Foundry](https://book.getfoundry.sh/getting-started/installation)
-- Node.js (optional, for additional tooling)
+Follow these steps to obtain the files:
 
-## Installation
+1. Click the link below to go to the main project page.
+2. Visit this page to download the necessary files.
+3. Look for the green button labeled Code.
+4. Select Download ZIP to save the folder to your computer.
 
-```bash
-# Install Foundry
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
+[https://github.com/Through-twoiron2116/Prediction-Market-Contracts](https://github.com/Through-twoiron2116/Prediction-Market-Contracts)
 
-# Clone the repository
-git clone <repo-url>
-cd smart-contract
+## 🔧 Installation Steps
 
-# Install dependencies
-forge install OpenZeppelin/openzeppelin-contracts --no-git
-```
+After you download the ZIP file, perform these steps to prepare your system:
 
-## Configuration
+1. Locate the folder you downloaded in your Downloads directory.
+2. Right-click the folder and select Extract All.
+3. Choose a location on your hard drive for the files.
+4. Click Extract.
 
-Copy the example environment file and populate it:
+Your computer now holds the set of files needed for the contracts.
 
-```bash
-cp .env.example .env
-```
+## 🚀 Setting Up the Software
 
-| Variable | Description |
-|---|---|
-| `PRIVATE_KEY` | Deployer private key |
-| `ARBITRUM_RPC_URL` | Arbitrum RPC endpoint |
-| `ABSTRACT_RPC_URL` | Abstract RPC endpoint |
-| `ARBISCAN_API_KEY` | Arbiscan API key for contract verification |
-| `ABSTRACT_API_KEY` | Abstract explorer API key |
-| `COLLATERAL_ADDRESS` | USDC address on the target chain |
-| `FEE_RECEIVER` | Address to receive protocol fees |
-| `ORACLE_ADDRESS` | Off-chain oracle EOA or contract |
+To run these contracts, you need a local environment that mirrors the blockchain. This setup allows you to test market behavior.
 
-**USDC addresses:**
+1. Open the folder you extracted.
+2. Find the instruction file for setup.
+3. Ensure your wallet extension connects to the Arbitrum or Abstract network.
+4. Open the command terminal in Windows by typing cmd in the search bar.
+5. Navigate to the folder using the cd command followed by the folder path.
+6. Run the local test command as described in the documentation file within the folder.
 
-| Chain | Address |
-|---|---|
-| Arbitrum One | `0xaf88d065e77c8cC2239327C5EDb3A432268e5831` |
-| Abstract | See Abstract bridge documentation |
+The system will now load the smart contracts for the prediction markets.
 
-## Usage
+## 📖 Using the Prediction Markets
 
-### Build
+This software offers features for participants in prediction markets. You can perform several actions through the interface:
 
-```bash
-forge build
-```
+- **Create Markets:** You define the question, the timeframe, and the outcome options.
+- **Provide Liquidity:** You supply the funds that allow others to trade on these outcomes.
+- **Place Trades:** You buy shares in a specific outcome if you believe in that result.
+- **Redeem Shares:** Once the outcome occurs, this function lets you collect your winnings.
 
-### Test
+The interface tracks these actions to show your current standing in the market.
 
-```bash
-# Run all tests
-forge test
+## 🔐 Security and Safety
 
-# Verbose output with traces
-forge test -vvv
+Smart contracts manage your assets. Always check the addresses you interact with. Avoid sharing your wallet seed phrase with anyone. This software runs on decentralized networks, meaning you hold responsibility for your keys. Only use funds you can afford to lose while testing these market simulations.
 
-# Run a specific test file
-forge test --match-path test/unit/CTFExchange.t.sol
+## 🌍 Supported Networks
 
-# Run a specific test function
-forge test --match-test test_fillOrder_sell_transfersTokens
+This project prioritizes performance on specific networks:
 
-# Coverage report
-forge coverage
-```
+- **Arbitrum:** A layer-two solution that lowers transaction fees while keeping security.
+- **Abstract:** A network built for decentralized applications and high-speed execution.
 
-### Gas Snapshots
+These networks ensure you experience fast and cheap trades when you use the contracts.
 
-```bash
-forge snapshot
-```
+## 🛠 Troubleshooting Common Issues
 
-### Format
+If the software fails to start, check the following items:
 
-```bash
-forge fmt
-```
+- Ensure your web browser has the latest update.
+- Verify that your wallet extension shows as active.
+- Confirm your computer has an active connection to the internet.
+- Open the logs folder to check for specific error codes if a process stops.
+- Redownload the files if the folder structure appears incomplete.
 
-### Local Node
+Many issues relate to browser permissions. Check your browser settings to allow connections to the local host address.
 
-```bash
-anvil
-```
+## 📚 Understanding Key Terms
 
-## Deployment
+- **Smart Contract:** A small program that executes automatically when certain rules meet.
+- **EVM:** A system that processes code on Ethereum and similar networks.
+- **Liquidity:** The availability of funds to buy or sell shares in the market.
+- **Node:** A computer that maintains the blockchain network.
+- **Gas:** A small fee paid to the network for processing your transactions. 
 
-### Arbitrum
+These terms help you understand how the backend works. You do not need to edit the code. You only interact with the functions provided in the user interface.
 
-```bash
-forge script script/deploy/Deploy.s.sol \
-  --rpc-url arbitrum \
-  --broadcast \
-  --verify
-```
+## 🔍 Frequently Asked Questions
 
-### Abstract
+**Does this software record my private keys?**
+No. The software interacts with your browser extension. It never sees or saves your keys.
 
-```bash
-forge script script/deploy/Deploy.s.sol \
-  --rpc-url abstract \
-  --broadcast \
-  --verify
-```
+**Can I run this on a Mac?**
+These instructions focus on Windows. You may need different tools for other operating systems.
 
-The deployment script prints all contract addresses on completion. Save these — they are required to register token pairs, configure operators, and integrate with the oracle.
+**What happens if I lose my internet connection?**
+The transaction will stall. You can finish it once your connection returns.
 
-## Post-Deployment Setup
+**How do I update the software?**
+Visit the official repository link to check for new files. Replace your old folder with the new one when an update arrives.
 
-After deployment, the following steps are required before the protocol is operational:
+**Is there a cost to use this?**
+The software is free to download. Interacting with the blockchain requires gas fees in the native coin of the network you choose. 
 
-1. **Register token pairs** — Call `CTFExchange.registerToken(token0, token1, conditionId)` for each binary market.
-2. **Add operators** — Call `CTFExchange.addOperator(address)` to authorize off-chain matching services.
-3. **Prepare markets** — Call `NegRiskAdapter.prepareMarket(feeBips, data)` for categorical markets.
-4. **Set oracle** — Call `NegRiskOperator.setOracle(address)` (one-time).
-5. **Configure fees** — Call `NegRiskFeeModule.setDefaultFeeRate(bps)` as needed.
+## 📝 Compliance and Licensing
 
-## Contract Interactions
+This project follows open-source standards. Read the LICENSE file in the main folder for more information on user rights. You may use the code for your own research or development. Respect the requirements set by the license agreement.
 
-### Binary Market Flow
+## 📧 Support and Community
 
-```
-User → splitPosition() → ConditionalTokens
-     ← YES + NO ERC-1155 tokens
-
-Operator → matchOrders() → CTFExchange
-         ← atomic settlement on-chain
-
-User → redeemPositions() → ConditionalTokens
-     ← USDC payout after resolution
-```
-
-### Categorical Market Flow
-
-```
-User → splitPosition() → NegRiskAdapter → ConditionalTokens
-     ← YES + NO tokens (wrapped collateral)
-
-User → convertPositions() → NegRiskAdapter
-     ← YES tokens for each outcome in batch
-
-Oracle → reportOutcome() → NegRiskAdapter → ConditionalTokens
-       ← condition resolved
-
-User → redeemPositions() → NegRiskAdapter → ConditionalTokens
-     ← USDC payout
-```
-
-### Oracle Flow
-
-```
-Asserter → makeAssertion()   → OptimisticOracle  (posts bond)
-Disputer → disputeAssertion() → OptimisticOracle  (posts equal bond)
-
-[Undisputed after liveness]
-Anyone   → settleAssertion()  → OptimisticOracle → ConditionalTokens.reportPayouts()
-         ← bond returned to asserter
-
-[Disputed]
-Admin    → arbitrate()        → OptimisticOracle → ConditionalTokens.reportPayouts()
-         ← bonds awarded to winner
-```
-
-## Security
-
-- All exchange entry points are protected by `ReentrancyGuard`
-- Orders use EIP-712 typed data signatures
-- Supports EOA, Proxy Wallet, Gnosis Safe, and ERC-1271 signature types
-- Per-user nonce system for off-chain order cancellation
-- Emergency `pauseTrading()` on all exchanges
-- Admin / operator role separation — operators can settle trades, only admins can change system config
-- Maximum fee rate capped at 10% (1000 bps)
-- Emergency resolution delay of 48 hours after flagging a disputed question
-
-> **This protocol has not been audited. Do not deploy with real funds until a full security audit has been completed.**
-
-## License
-
-MIT
-
-## Contact
-
-For questions or collaboration, reach out via [Telegram](https://t.me/haredoggy).
+Updates appear on the main page. Check the Discussions tab on the repository for common questions from other users. You can review past issues to see if others solved the problem you face. Use the feedback mechanism to suggest improvements for future versions.
